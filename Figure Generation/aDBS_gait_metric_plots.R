@@ -5,8 +5,6 @@ library(export)
 library(ggsignif)
 library(cowplot)
 
-print = FALSE
-
 #### Helper functions ####
 outlier_threshold <- function(df,variableName,quantileVal)
 {
@@ -35,6 +33,30 @@ gen_plot <- function(df,variableName,plotType)
             axis.title.y = element_text(size = 6),
             axis.text = element_text(size = 6),
             legend.key.size = unit(0.5,"line"),
+            strip.background = element_blank(),
+            strip.text = element_text(size = 7),
+            panel.grid = element_blank(),
+            panel.border = element_blank(),
+            panel.spacing = unit(0.25, "lines"),
+            axis.line.x = element_line(linetype = "solid", colour = "black"),
+            axis.line.y = element_line(linetype = "solid", colour = "black"))
+  } else if (plotType == "var"){
+    out_plot <- ggplot(data = summary_df,aes(x = VisitName,y = !!sym(variableName),color = Side,group = Side))+
+      geom_point(position = position_dodge2(width = 0.5)) + 
+      geom_line(position = position_dodge2(width = 0.5))+
+      facet_grid(~SubjectID)+
+      scale_x_discrete()+
+      scale_color_manual(name = "Leg:",
+                         labels = c("Left","Right"),
+                         values = c("#fb8072","#80b1d3"))+
+      facet_grid(~SubjectID,labeller = labeller(SubjectID = c("P1" = "Patient 1", "P2" = "Patient 2","P3" = "Patient 3","P4" = "Patient 4","P5" = "Patient 5"))) + 
+      theme_bw(base_size = 5)+
+      theme(plot.title = element_text(hjust = 0.5,size = 8),
+            axis.title.x = element_blank(),
+            axis.title.y = element_text(size = 6),
+            axis.text = element_text(size = 6),
+            legend.key.size = unit(0.5,"line"),
+            legend.text = element_text(size = 5,margin = margin(0,0,0,0)),
             strip.background = element_blank(),
             strip.text = element_text(size = 7),
             panel.grid = element_blank(),
@@ -75,27 +97,27 @@ gen_plot <- function(df,variableName,plotType)
 
 #### Load in data, filter, and format ####
 # P1
-P1_gait_data <- read.csv('/Users/USER/Documents/P1_aggregate_gait_metrics.csv')
+P1_gait_data <- read.csv('P1_gait_metrics.csv')
 
 P1_clinicOpt_to_aDBS <- P1_gait_data %>% filter(VisitName %in% c("dbsOptBilateral","aDBS")) %>% mutate(Side = as_factor(Side))
 
 # P2
-P2_gait_data <- read.csv('Users/USER/Documents/P2_aggregate_gait_metrics.csv');
+P2_gait_data <- read.csv('P2_gait_metrics.csv');
 
 P2_clinicOpt_to_aDBS <- P2_gait_data %>% filter(VisitName %in% c("dbsOptBilateral","aDBS")) %>% mutate(Side = as_factor(Side))
 
 # P3
-P3_gait_data <- read.csv('Users/USER/Documents/P3_aggregate_gait_metrics.csv')
+P3_gait_data <- read.csv('P3_gait_metrics.csv')
 
 P3_clinicOpt_to_aDBS <- P3_gait_data %>% filter(VisitName %in% c("dbsOptBilateral","aDBS")) %>% mutate(Side = as_factor(Side))
 
 # P4
-P4_gait_data <- read.csv('Users/USER/Documents/P4_aggregate_gait_metrics.csv')
+P4_gait_data <- read.csv('P4_gait_metrics.csv')
 
-P4_clinicOpt_to_aDBS <- P4_gait_data %>% filter(VisitName %in% c("dbsOptUnilateral","aDB")) %>% mutate(Side = as_factor(Side))
+P4_clinicOpt_to_aDBS <- P4_gait_data %>% filter(VisitName %in% c("dbsOptUnilateral","aDBS")) %>% mutate(Side = as_factor(Side))
 
 # P5
-P5_gait_data <- read.csv('Users/USER/Documents/P5_aggregate_gait_metrics.csv')
+P5_gait_data <- read.csv('P5_gait_metrics.csv')
 
 P5_clinicOpt_to_aDBS <- P5_gait_data %>% filter(VisitName %in% c("dbsOptBilateral","aDBS")) %>% mutate(Side = as_factor(Side))
 
@@ -199,7 +221,7 @@ step_time_symmetry_plot <- gen_plot(clinicOpt_to_aDBS_w_symmetry,"StepTimeSymmet
 # Grouped symmetry plots
 group_step_length_symmetry_plot = ggplot(data = group_step_length, aes(x = VisitName,y = StepLengthSymmetry)) + 
   geom_boxplot(outlier.shape = NaN) + 
-  geom_point(data = group_step_length,aes(color = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
+  geom_point(data = group_step_length,aes(color = SubjectID,shape = SubjectID,fill = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
   geom_signif(data = data.frame(start = c("cDBS"),
                                 end = c("aDBS"),
                                 y = c(0.26),
@@ -209,6 +231,12 @@ group_step_length_symmetry_plot = ggplot(data = group_step_length, aes(x = Visit
   scale_color_manual(name = "",
                      labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
                      values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_fill_manual(name = "",
+                     labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                     values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                     values = c(21,22,23,24,25))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Absolute Asymmetry")+
   ggtitle("Grouped Step\nLength Symmetry ") + 
@@ -227,7 +255,7 @@ group_step_length_symmetry_plot = ggplot(data = group_step_length, aes(x = Visit
 
 group_step_time_symmetry_plot = ggplot(data = group_step_time, aes(x = VisitName,y = StepTimeSymmetry)) + 
   geom_boxplot(outlier.shape = NaN) + 
-  geom_point(data = group_step_time,aes(color = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
+  geom_point(data = group_step_time,aes(color = SubjectID,shape = SubjectID,fill = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
   geom_signif(data = data.frame(start = c("cDBS"),
                                 end = c("aDBS"),
                                 y = c(0.26),
@@ -237,6 +265,12 @@ group_step_time_symmetry_plot = ggplot(data = group_step_time, aes(x = VisitName
   scale_color_manual(name = "",
                      labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
                      values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                    values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                     values = c(21,22,23,24,25))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Absolute Asymmetry")+
   ggtitle("Grouped Step\nTime Symmetry") + 
@@ -255,10 +289,16 @@ group_step_time_symmetry_plot = ggplot(data = group_step_time, aes(x = VisitName
 
 group_step_length_CV_L_plot = ggplot(data = group_step_CV %>% filter(Side == "L"), aes(x = VisitName,y = StepLengthCV)) + 
   geom_boxplot(outlier.shape = NaN) + 
-  geom_point(data = group_step_CV,aes(color = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
+  geom_point(data = group_step_CV %>% filter(Side == "L"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
   scale_color_manual(name = "",
                      labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
                      values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                    values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                     values = c(21,22,23,24,25))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Coefficient of Variation")+
   ggtitle("Left") +
@@ -275,10 +315,16 @@ group_step_length_CV_L_plot = ggplot(data = group_step_CV %>% filter(Side == "L"
   
 group_step_length_CV_R_plot = ggplot(data = group_step_CV %>% filter(Side == "R"), aes(x = VisitName,y = StepLengthCV)) + 
   geom_boxplot(outlier.shape = NaN) + 
-  geom_point(data = group_step_CV,aes(color = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
+  geom_point(data = group_step_CV %>% filter(Side == "R"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
   scale_color_manual(name = "",
                      labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
                      values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                    values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                     values = c(21,22,23,24,25))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Coefficient of Variation")+
   ggtitle("Right") + 
@@ -295,7 +341,7 @@ group_step_length_CV_R_plot = ggplot(data = group_step_CV %>% filter(Side == "R"
 
 group_step_time_CV_L_plot = ggplot(data = group_step_CV %>% filter(Side == "L"), aes(x = VisitName,y = StepTimeCV)) + 
   geom_boxplot(outlier.shape = NaN) + 
-  geom_point(data = group_step_CV,aes(color = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
+  geom_point(data = group_step_CV %>% filter(Side == "L"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
   geom_signif(data = data.frame(start = c("cDBS"),
                                 end = c("aDBS"),
                                 y = c(0.13),
@@ -305,8 +351,14 @@ group_step_time_CV_L_plot = ggplot(data = group_step_CV %>% filter(Side == "L"),
   scale_color_manual(name = "",
                      labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
                      values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                    values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                     values = c(21,22,23,24,25))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  ylab("Coefficient of Variation")+
+  ylab("Coefficient of Variation")+ 
   ggtitle("Left") + 
   theme_bw(base_size = 5)+
   theme(plot.title = element_text(hjust = 0.5,size = 6),
@@ -321,12 +373,18 @@ group_step_time_CV_L_plot = ggplot(data = group_step_CV %>% filter(Side == "L"),
 
 group_step_time_CV_R_plot = ggplot(data = group_step_CV %>% filter(Side == "R"), aes(x = VisitName,y = StepTimeCV)) + 
   geom_boxplot(outlier.shape = NaN) + 
-  geom_point(data = group_step_CV,aes(color = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
+  geom_point(data = group_step_CV %>% filter(Side=="R"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_jitter(width = 0.25, height = 0), size = 0.5, alpha = 0.5) + 
   scale_color_manual(name = "",
                      labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
                      values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                    values = c("#3CC1C8","#FAA41D","#ED2790","#6BBD46","#3B54A4"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 1","Patient 2", "Patient 3", "Patient 4", "Patient 5"),
+                     values = c(21,22,23,24,25))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  ylab("Coefficient of Variation")+
+  ylab("Coefficient of Variation")+ 
   ggtitle("Right") + 
   theme_bw(base_size = 5)+
   theme(plot.title = element_text(hjust = 0.5,size = 6),

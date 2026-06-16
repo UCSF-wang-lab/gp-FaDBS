@@ -4,7 +4,7 @@ library(export)
 library(cowplot)
 
 # Extract data
-accuracy_df = read.csv('/Users/USER/Documents/all_patient_aDBS_accuracy_data.csv')
+accuracy_df = read.csv('/Users/USER/Documents/Figure3B.csv')
 accuracy_df <- accuracy_df %>% rename(TP = TP..dur.,FN = FN..dur.,FP = FP..dur.,TN = TN..dur.)
 
 P1_data <- accuracy_df %>% filter(SubjectID == "P1") %>% mutate(Side = as_factor(Side))

@@ -1,6 +1,6 @@
  %% Load data
-P2_data = '/Users/USER/Documents/P2_dbs_opt_data.csv';
-P3_data = '/Users/USER/Documents/P3_dbs_opt_data.csv';
+P2_data = '/Users/USER/Documents/P2/P2_file*';
+P3_data = '/Users/USER/Documents/P3/P3_file*';
 
 folder_list = {P2_data,P3_data};
 gait_event_order = {'LHS','RTO','RHS','LTO'};

@@ -71,7 +71,7 @@ gen_plot2 <- function(df,side)
 }
 
 ##### Load data ####
-data <- read.csv("/Users/USER/Documents/all_patients_biomarker_power.csv")
+data <- read.csv("/Users/USER/Documents/Figure3C.csv")
 data <- data %>% mutate(VisitName = if_else(str_detect(VisitName,"dbsOpt|ptClinic"),"Post optimized DBS",if_else(str_detect(VisitName,"aDBS"),"aDBS","Pre optimized DBS"))) %>% 
   mutate(VisitName = as_factor(VisitName)) %>% 
   mutate(VisitName = fct_relevel(VisitName,c("Pre optimized DBS","Post optimized DBS","aDBS"))) %>% 
@@ -117,9 +117,9 @@ P1_left_plot <- gen_plot2(P1,"Left") + ggtitle("Patient 1")
 P1_right_plot <- gen_plot2(P1,"Right")
 P2_left_plot <- gen_plot(P2,"Left") + ggtitle("Patient 2")
 P2_right_plot <- gen_plot(P3,"Right")
-P3_left_plot <- gen_plot(P3,"Left") + ggtitle("Patient 3") #+ coord_cartesian(xlim = c(0,600))
-P3_right_plot <- gen_plot(P4,"Right") #+ coord_cartesian(xlim = c(0,600))
-P4_left_plot <- gen_plot(P4,"Left") + ggtitle("Patient 4") #+ coord_cartesian(xlim = c(0,400))
+P3_left_plot <- gen_plot(P3,"Left") + ggtitle("Patient 3") 
+P3_right_plot <- gen_plot(P4,"Right") 
+P4_left_plot <- gen_plot(P4,"Left") + ggtitle("Patient 4") 
 P5_left_plot <- gen_plot2(P5,"Left") + ggtitle("Patient 5")
 P5_right_plot <- gen_plot2(P5,"Right")
 

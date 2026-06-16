@@ -1,5 +1,5 @@
 %% EXAMPLE 1
-load('/Users/USER/Documents/P2_aDBS_aligned_data.mat');
+load('/Users/USER/Documents/aDBS_exampleFigure3A.mat');
 
 legend_elements = [];
 

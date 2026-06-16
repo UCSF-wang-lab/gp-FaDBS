@@ -19,7 +19,7 @@ outlier_threshold <- function(df,variableName,quantileVal)
 
 ##### In-clinic gait metrics #####
 # Load data
-clinic_data <-read.csv('/Users/USER/Documents/long-term_aDBS_gait_metrics.csv')
+clinic_data <-read.csv('Figure5D_ED2.csv')
 clinic_data <- clinic_data %>% 
   mutate(SubjectID = as.factor(SubjectID),
          SubjectID = fct_relevel(SubjectID,c("P2","P3","P4")),
@@ -60,15 +60,15 @@ gait_metrics <- clinic_data_filt %>%
 
 summary_clinic_data <- gait_metrics %>% group_by(SubjectID,DBSCondition,Metric,Side) %>% 
   summarise(mean = mean(abs(Value/100),na.rm = TRUE),
-            lower = mean(abs(Value/100),na.rm = TRUE)-(sd(abs(Value/100),na.rm = TRUE)/sqrt(n())),
-            upper = mean(abs(Value/100),na.rm = TRUE)+(sd(abs(Value/100),na.rm = TRUE)/sqrt(n())),
-            var = var(abs(Value/100),na.rm = TRUE),sd = sd(abs(Value/100),na.rm = TRUE),
-            cv = sd(Value,na.rm = TRUE)/mean(Value,na.rm = TRUE)) %>% 
+  lower = mean(abs(Value/100),na.rm = TRUE)-(sd(abs(Value/100),na.rm = TRUE)/sqrt(n())),
+  upper = mean(abs(Value/100),na.rm = TRUE)+(sd(abs(Value/100),na.rm = TRUE)/sqrt(n())),
+  var = var(abs(Value/100),na.rm = TRUE),sd = sd(abs(Value/100),na.rm = TRUE),
+  cv = sd(Value,na.rm = TRUE)/mean(Value,na.rm = TRUE)) %>% 
   ungroup() %>% 
   group_by(SubjectID,Metric,Side) %>% 
   mutate(percentChange_C_to_RU = ((mean[2]-mean[1])/mean[1])*100,
-         percentChange_C_to_RD = ((mean[3]-mean[1])/mean[1])*100,
-         percentChange_RU_to_RD = ((mean[3]-mean[2])/mean[2])*100)
+  percentChange_C_to_RD = ((mean[3]-mean[1])/mean[1])*100,
+  percentChange_RU_to_RD = ((mean[3]-mean[2])/mean[2])*100)
 
 # Plots
 clinic_sl_plot <- ggplot()+
@@ -158,11 +158,17 @@ clinic_st_plot <- ggplot()+
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
 group_sl_CV_L_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "StepLength", Side == "Left"), aes(x = DBSCondition, y = cv, group = SubjectID))+
-  geom_point(data = summary_clinic_data %>% filter(Metric == "StepLength", Side == "Left"),aes(color = SubjectID), position = position_dodge2(width = 0.25)) + 
-  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25))+
+  geom_point(data = summary_clinic_data %>% filter(Metric == "StepLength", Side == "Left"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_dodge2(width = 0.25), size = 1) + 
+  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25), linewidth = 0.25, show.legend = FALSE)+
   scale_color_manual(name = "",
                      labels = c("Patient 2", "Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Coefficient of Variation")+
   ggtitle("Left") +
@@ -180,11 +186,17 @@ group_sl_CV_L_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "Ste
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
 group_sl_CV_R_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "StepLength", Side == "Right"), aes(x = DBSCondition, y = cv, group = SubjectID))+
-  geom_point(data = summary_clinic_data %>% filter(Metric == "StepLength", Side == "Right"),aes(color = SubjectID), position = position_dodge2(width = 0.25)) + 
-  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25))+
+  geom_point(data = summary_clinic_data %>% filter(Metric == "StepLength", Side == "Right"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_dodge2(width = 0.25), size = 1) + 
+  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25), linewidth = 0.25)+
   scale_color_manual(name = "",
                      labels = c("Patient 2", "Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Coefficient of Variation")+
   ggtitle("Right") +
@@ -202,11 +214,17 @@ group_sl_CV_R_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "Ste
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
 group_st_CV_L_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "StepTime", Side == "Left"), aes(x = DBSCondition, y = cv, group = SubjectID))+
-  geom_point(data = summary_clinic_data %>% filter(Metric == "StepTime", Side == "Left"),aes(color = SubjectID), position = position_dodge2(width = 0.25)) + 
-  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25))+
+  geom_point(data = summary_clinic_data %>% filter(Metric == "StepTime", Side == "Left"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_dodge2(width = 0.25), size = 1) + 
+  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25), linewidth = 0.25)+
   scale_color_manual(name = "",
                      labels = c("Patient 2", "Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Coefficient of Variation")+
   ggtitle("Left") +
@@ -224,11 +242,17 @@ group_st_CV_L_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "Ste
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
 group_st_CV_R_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "StepTime", Side == "Right"), aes(x = DBSCondition, y = cv, group = SubjectID))+
-  geom_point(data = summary_clinic_data %>% filter(Metric == "StepTime", Side == "Right"),aes(color = SubjectID), position = position_dodge2(width = 0.25)) + 
-  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25))+
+  geom_point(data = summary_clinic_data %>% filter(Metric == "StepTime", Side == "Right"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_dodge2(width = 0.25), size = 1) + 
+  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25), linewidth = 0.25)+
   scale_color_manual(name = "",
                      labels = c("Patient 2", "Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Coefficient of Variation")+
   ggtitle("Right") +
@@ -246,11 +270,24 @@ group_st_CV_R_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "Ste
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
 group_step_length_symmetry_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "StepLengthSymm"), aes(x = DBSCondition, y = mean, group = SubjectID))+
-  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25), linewidth = 0.5)+
-  geom_errorbar(aes(ymin = lower,ymax = upper,color = SubjectID),width = 0.25,position = position_dodge2(width=0.25)) + 
+  geom_point(data = summary_clinic_data %>% filter(Metric == "StepLengthSymm"),aes(color = SubjectID,shape = SubjectID, fill = SubjectID), position = position_dodge2(width = 0.25),size = 1) +
+  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25), linewidth = 0.25, show.legend = FALSE)+
+  geom_errorbar(aes(ymin = lower,ymax = upper,color = SubjectID),width = 0.25,position = position_dodge2(width=0.25), linewidth = 0.25, show.legend = FALSE) + 
+  geom_signif(data = data.frame(SubjectID = c("P2","P2","P2"),
+                                start = c("cDBS","cDBS","RU-aDBS"),
+                                end = c("RD-aDBS","RU-aDBS","RD-aDBS"),
+                                y = c(0.18,0.17,0.16),
+                                label = c("")),
+              aes(y_position = y,xmin = start,xmax = end,annotations = label), color = "black", size = 0.25, textsize = 2, vjust = 0.5,tip_length = 0, manual = TRUE)+
   scale_color_manual(name = "",
                      labels = c("Patient 2", "Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Absolute Asymmetry")+
   ggtitle("Step Length Symmetry") +
@@ -268,11 +305,24 @@ group_step_length_symmetry_plot = ggplot(data = summary_clinic_data %>% filter(M
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
 group_step_time_symmetry_plot = ggplot(data = summary_clinic_data %>% filter(Metric == "StepTimeSymm"), aes(x = DBSCondition, y = mean, group = SubjectID))+
-  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25), linewidth = 0.5)+
-  geom_errorbar(aes(ymin = lower,ymax = upper,color = SubjectID),width = 0.25,position = position_dodge2(width=0.25)) + 
+  geom_point(data = summary_clinic_data %>% filter(Metric == "StepTimeSymm"),aes(color = SubjectID, shape = SubjectID, fill = SubjectID), position = position_dodge2(width = 0.25),size = 1) +
+  geom_line(aes(color = SubjectID),position = position_dodge2(width = 0.25), linewidth = 0.25, show.legend = FALSE)+
+  geom_errorbar(aes(ymin = lower,ymax = upper,color = SubjectID),width = 0.25,position = position_dodge2(width=0.25), linewidth = 0.25, show.legend = FALSE) + 
+  geom_signif(data = data.frame(SubjectID = c("P2","P2","P2"),
+                                start = c("cDBS","cDBS","RU-aDBS"),
+                                end = c("RD-aDBS","RU-aDBS","RD-aDBS"),
+                                y = c(0.09,0.085,0.08),
+                                label = c("")),
+              aes(y_position = y,xmin = start,xmax = end,annotations = label), color = "black", size = 0.25, textsize = 2, vjust = 0.5,tip_length = 0, manual = TRUE)+
   scale_color_manual(name = "",
                      labels = c("Patient 2", "Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   ylab("Absolute Asymmetry")+
   ggtitle("Step Time Symmetry") +
@@ -312,6 +362,12 @@ common_clinic_color_legend <- get_plot_component(signif_color_plot +
                                                    theme(legend.position = "bottom",
                                                          legend.text = element_text(margin = margin(0,5,0,5))),
                                                  'guide-box-bottom',return_all = TRUE)
+
+common_clinic_symm_legend <- get_plot_component(group_step_length_symmetry_plot + 
+                                                  guides(color = guide_legend(nrow = 1,ncol = 3)) +
+                                                  theme(legend.position = "bottom",
+                                                        legend.text = element_text(margin = margin(0,5,0,5))),
+                                                'guide-box-bottom',return_all = TRUE)
 
 common_cv_legend <- get_plot_component(group_sl_CV_L_plot + 
                                          guides(color = guide_legend(nrow = 1,ncol = 3)) +
@@ -357,9 +413,9 @@ combined_clinic_metrics <- plot_grid(group_step_length_symmetry_plot + theme(leg
                                      rel_widths = c(0.5,0.05,1),
                                      rel_heights = c(1,0.05,1))
 
-combined_clinic_legend <- plot_grid(NULL,common_clinic_fill_legend,NULL,common_clinic_color_legend,NULL,
-                                    ncol = 5,
-                                    rel_widths = c(0.75,1,0.01,1,0.75))
+combined_clinic_legend <- plot_grid(NULL,common_clinic_symm_legend,NULL,common_clinic_fill_legend,NULL,common_clinic_color_legend,NULL,
+                                    ncol = 7,
+                                    rel_widths = c(0.25,1,0.25,1,0.01,1,0.4))
 
 combined_clinic_metrics_w_legend <- plot_grid(combined_clinic_metrics,
                                               combined_clinic_legend,
@@ -396,7 +452,7 @@ combined_clinic_var_metrics_with_title <- plot_grid(combined_clinic_var_title,co
 
 ##### Long-term Rover #####
 # Load data
-rover_data <- read.csv('/Users/USER/Documents/P2_P3_P4_Long-Term_Rover_Metrics.csv')
+rover_data <- read.csv('Figure5C.csv')
 
 data2 <- rover_data %>% 
   mutate(SubjectID = as.factor(SubjectID),
@@ -411,19 +467,20 @@ data3 <- data2 %>% group_by(SubjectID,Condition,metric) %>%
   ungroup() %>% 
   mutate(Condition = fct_recode(Condition, "C" = "clinical", "RU" = "ramp_up", "RD" = "ramp_down"))
 
-data4 <- data2 %>% group_by(Condition,metric) %>% 
-  summarise(mean = mean(abs(value), na.rm = TRUE), sd = sd(abs(value), na.rm = TRUE), se = sd/sqrt(n()), cv = sd/mean) %>% 
-  ungroup() %>% 
-  mutate(Condition = fct_recode(Condition, "C" = "clinical", "RU" = "ramp_up", "RD" = "ramp_down"))
-
 # Plots
-rover_sl_plot <- ggplot(data = data3 %>% filter(metric == "Stride_Length"),aes(x = Condition, y = mean, color = SubjectID, group = SubjectID))+
-  geom_point(position = position_dodge2(width = 0.5)) + 
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),position = position_dodge2(width = 0.5),width = 0.5, show.legend = FALSE) +
-  geom_path(position = position_dodge2(width = 0.5), show.legend = FALSE) +
+rover_sl_plot <- ggplot(data = data3 %>% filter(metric == "Stride_Length"),aes(x = Condition, y = mean, color = SubjectID, shape = SubjectID, fill = SubjectID, group = SubjectID))+
+  geom_point(position = position_dodge2(width = 0.25), size = 1) + 
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),position = position_dodge2(width = 0.25),width = 0.25, linewidth = 0.25, show.legend = FALSE) +
+  geom_path(position = position_dodge2(width = 0.25), show.legend = FALSE, linewidth = 0.25) +
   scale_color_manual(name = "",
                      labels = c("Patient 2","Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_x_discrete(labels = c("C" = "cDBS", "RU" = "RU-aDBS", "RD" = "RD-aDBS")) + 
   theme_bw(base_size = 5) +
   xlab("") + 
@@ -442,13 +499,19 @@ rover_sl_plot <- ggplot(data = data3 %>% filter(metric == "Stride_Length"),aes(x
         axis.line.x = element_line(linetype = "solid", colour = "black"),
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
-rover_ws_plot <- ggplot(data = data3 %>% filter(metric == "Walking_Speed"),aes(x = Condition, y = mean, color = SubjectID, group = SubjectID))+
-  geom_point(position = position_dodge2(width = 0.5)) + 
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),position = position_dodge2(width = 0.5),width = 0.5, show.legend = FALSE) +
-  geom_path(position = position_dodge2(width = 0.5), show.legend = FALSE) +
+rover_ws_plot <- ggplot(data = data3 %>% filter(metric == "Walking_Speed"),aes(x = Condition, y = mean, color = SubjectID, shape = SubjectID, fill = SubjectID, group = SubjectID))+
+  geom_point(position = position_dodge2(width = 0.25), size = 1) + 
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),position = position_dodge2(width = 0.25),width = 0.25, linewidth = 0.25, show.legend = FALSE) +
+  geom_path(position = position_dodge2(width = 0.25), show.legend = FALSE, linewidth = 0.25) +
   scale_color_manual(name = "",
                      labels = c("Patient 2","Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_x_discrete(labels = c("C" = "cDBS", "RU" = "RU-aDBS", "RD" = "RD-aDBS")) + 
   theme_bw(base_size = 5) +
   xlab("") + 
@@ -467,19 +530,25 @@ rover_ws_plot <- ggplot(data = data3 %>% filter(metric == "Walking_Speed"),aes(x
         axis.line.x = element_line(linetype = "solid", colour = "black"),
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
-rover_c_plot <- ggplot(data = data3 %>% filter(metric == "Cadence"),aes(x = Condition, y = mean, color = SubjectID, group = SubjectID))+
-  geom_point(position = position_dodge2(width = 0.5)) + 
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),position = position_dodge2(width = 0.5),width = 0.5, show.legend = FALSE) +
-  geom_path(position = position_dodge2(width = 0.5), show.legend = FALSE) +
+rover_c_plot <- ggplot(data = data3 %>% filter(metric == "Cadence"),aes(x = Condition, y = mean, color = SubjectID, shape = SubjectID, fill = SubjectID, group = SubjectID))+
+  geom_point(position = position_dodge2(width = 0.25), size = 1) + 
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),position = position_dodge2(width = 0.25),width = 0.25, linewidth = 0.25, show.legend = FALSE) +
+  geom_path(position = position_dodge2(width = 0.25), show.legend = FALSE, linewidth = 0.25) +
   geom_signif(data = data.frame(SubjectID = c("P2"),
                                 start = c("C"),
                                 end = c("RD"),
                                 y = c(118),
-                                label = c("*")),
+                                label = c("")),
               aes(y_position = y,xmin = start,xmax = end,annotations = label), color = "#FAA41D", size = 0.25, textsize = 2, vjust = 0.5,tip_length = 0, manual = TRUE)+
   scale_color_manual(name = "",
                      labels = c("Patient 2","Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_x_discrete(labels = c("C" = "cDBS", "RU" = "RU-aDBS", "RD" = "RD-aDBS")) + 
   theme_bw(base_size = 5) +
   xlab("") + 
@@ -498,13 +567,19 @@ rover_c_plot <- ggplot(data = data3 %>% filter(metric == "Cadence"),aes(x = Cond
         axis.line.x = element_line(linetype = "solid", colour = "black"),
         axis.line.y = element_line(linetype = "solid", colour = "black"))
 
-rover_symm_plot <- ggplot(data = data3 %>% filter(metric == "Symmetry"),aes(x = Condition, y = mean, color = SubjectID, group = SubjectID))+
-  geom_point(position = position_dodge2(width = 0.5)) + 
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),position = position_dodge2(width = 0.5),width = 0.5, show.legend = FALSE) +
-  geom_path(position = position_dodge2(width = 0.5), show.legend = FALSE) +
+rover_symm_plot <- ggplot(data = data3 %>% filter(metric == "Symmetry"),aes(x = Condition, y = mean, color = SubjectID, shape = SubjectID, fill = SubjectID, group = SubjectID))+
+  geom_point(position = position_dodge2(width = 0.25), size = 1) + 
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se),position = position_dodge2(width = 0.25),width = 0.25, linewidth = 0.25, show.legend = FALSE) +
+  geom_path(position = position_dodge2(width = 0.25), show.legend = FALSE, linewidth = 0.25) +
   scale_color_manual(name = "",
                      labels = c("Patient 2","Patient 3", "Patient 4"),
                      values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_fill_manual(name = "",
+                    labels = c("Patient 2", "Patient 3", "Patient 4"),
+                    values = c("#FAA41D","#ED2790","#6BBD46"))+
+  scale_shape_manual(name = "",
+                     labels = c("Patient 2", "Patient 3", "Patient 4"),
+                     values = c(22,23,24))+
   scale_x_discrete(labels = c("C" = "cDBS", "RU" = "RU-aDBS", "RD" = "RD-aDBS")) + 
   theme_bw(base_size = 5) +
   xlab("") + 
@@ -549,7 +624,7 @@ rover_plots_with_title <- plot_grid(rover_plot_titles,combined_rover_metrics,
 
 ##### Post-motor Diary #####
 # Load data
-motor_diary_data <- read.csv('/Users/USER/Documents/Post-testing Motor Diary.csv') %>% 
+motor_diary_data <- read.csv('Figure5AB.csv') %>% 
   mutate(Rigidity = as.factor(case_when(str_detect(Rigidity,"Better") ~ "Better",str_detect(Rigidity,"same") ~ "Same",str_detect(Rigidity,"Worse") ~ "Worse")),
          Tremor = as.factor(case_when(str_detect(Tremor,"Better") ~ "Better",str_detect(Tremor,"same") ~ "Same",str_detect(Tremor,"Worse") ~ "Worse")),
          Dyskinesia = as.factor(case_when(str_detect(Dyskinesia,"Better") ~ "Better",str_detect(Dyskinesia,"same") ~ "Same",str_detect(Dyskinesia,"Worse") ~ "Worse")),
@@ -558,7 +633,7 @@ motor_diary_data <- read.csv('/Users/USER/Documents/Post-testing Motor Diary.csv
 
 aggregate_md_data <- motor_diary_data %>% filter(Setting != "") %>% 
   group_by(SubjectID,Setting) %>%
-  pivot_longer(cols = c(5:7,17,20), names_to = "columns", values_to = "value") %>%
+  pivot_longer(cols = c(3:7), names_to = "columns", values_to = "value") %>%
   count(columns, value) %>% 
   mutate(columns = as.factor(columns),
          Setting = factor(case_when(str_detect(Setting,"Clinical") ~ "cDBS",str_detect(Setting,"ramp-up") ~ "RU-aDBS",str_detect(Setting,"ramp-down") ~ "RD-aDBS"),levels = c("cDBS","RU-aDBS","RD-aDBS")))
@@ -574,7 +649,7 @@ cardinal_symptom_plot <- ggplot(aggregate_md_data %>% filter(columns %in% c("Rig
                     # labels = c("Better","Same","Worse"),
                     values = c("#1670B9","#4FA747","#BF2026")) + 
   ylab("Count") + 
-  facet_grid(SubjectID ~ columns, switch = "y", labeller = labeller(SubjectID = c("P2" = "Patient 2","P3" = "Patient 3","P4" = "Patient 4"))) + 
+  facet_grid(SubjectID ~ columns, switch = "y", labeller = labeller(SubjectID = c("P2" = "Patient 2","P3" = "Patient 3","P4" = "Patient 4"), columns = c("Dyskinesia" = "Dyskinesia","Rigidity" = "Patient-reported\nStiffness","Tremor" = "Tremor"))) + 
   theme_bw(base_size = 5)+
   theme(plot.title = element_text(hjust = 0.5,size = 6),
         axis.title.x = element_blank(),

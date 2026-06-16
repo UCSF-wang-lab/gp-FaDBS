@@ -5,14 +5,7 @@ library(rstatix)
 library(ggpattern)
 
 #### Grab and filter data ####
-data <- read.csv('/Users/USER/Documents/gait_cycle_spectrogram_data.csv')
-
-data_tile <- data %>% filter(FreqBandName %in% c("Theta","Alpha","Low Beta","High Beta","Low Gamma")) %>% 
-  mutate(FreqBandName = as_factor(FreqBandName),FreqBandName = fct_relevel(FreqBandName,c("Theta","Alpha","Low Beta","High Beta","Low Gamma"))) %>% 
-  mutate(Key = if_else(str_detect(Key,"Key0|Key1"),"Pallidum",if_else(str_detect(Key,"Key2"),"M1","PM"))) %>% 
-  mutate(Key = as_factor(Key)) %>% 
-  mutate(Key = fct_relevel(Key,c("Pallidum","M1","PM"))) %>% 
-  mutate(Hemisphere = as_factor(Hemisphere))
+data_tile <- read.csv('ED1.csv')
 
 #### Stats ####
 SW_normality_test <- data_tile %>% group_by(SubjectID,FreqBandName) %>% shapiro_test(Power)

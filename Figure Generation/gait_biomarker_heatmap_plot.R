@@ -2,7 +2,7 @@ library(tidyverse)
 library(cowplot)
 
 ##### Read in data and filter #####
-data <- read.csv('/Users/USER/Documents/search_data.csv')
+data <- read.csv('/Users/USER/Documents/Figure2B.csv')
 data_filt <- data %>% filter(Hemisphere == "left",Bitshift == X, FFT_Int == Y)
 
 FreqBins = seq(from = 0, to = 60, by = 500/Y)
